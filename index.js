@@ -32,7 +32,7 @@ app.post('/register', async (req, res) => {
 
 
     await pool.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hashedPassword]);
-    //dsdsd
+    //dsdsdsdsd
     res.status(201).json({ message: 'Usuario registrado exitosamente' });
   } catch (error) {
     console.error('Error al registrar el usuario:', error);
