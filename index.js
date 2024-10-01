@@ -17,16 +17,15 @@ const pool = new Pool({
   port: 5432,
 });
 
-// Configurar transporte para nodemailer
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'moisesbuitrago201@gmail.com', // Cambia a tu correo
-    pass: 'vhuj ndov yuds pqrq' // Cambia a tu contraseña
+    user: 'moisesbuitrago201@gmail.com', 
+    pass: 'vhuj ndov yuds pqrq' 
   }
 });
 
-// Ruta para registrar un usuario
 app.post('/register', async (req, res) => {
   const { username, password, email } = req.body;
 
@@ -46,7 +45,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// Ruta para login y enviar token por correo
+
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
@@ -61,10 +60,10 @@ app.post('/login', async (req, res) => {
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (passwordMatch) {
-      // Generar token JWT
+
       const token = jwt.sign({ username: user.username }, 'secretkey', { expiresIn: '10m' });
 
-      // Enviar token asdl correo
+
       const mailOptions = {
         from: 'tuemail@gmail.com',
         to: user.email,
@@ -100,7 +99,6 @@ app.post('/verify-token', (req, res) => {
   });
 });
 
-// verify connection configuration
 transporter.verify(function (error, success) {
   if (error) {
     console.log(error);
