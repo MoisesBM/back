@@ -77,6 +77,8 @@ app.post('/login', async (req, res) => {
         } else {
           res.json({ message: 'Correo con token enviado exitosamente' });
         }
+        console.log('Correo enviado: ' + info.response);
+        console.log(info.accepted);
       });
 
     } else {
@@ -106,6 +108,7 @@ transporter.verify(function (error, success) {
     console.log("El servidor esta listo y cargado!");
   }
 });
+
 
 // Iniciar el servidor
 app.listen(3000, () => {
