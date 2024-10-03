@@ -6,7 +6,7 @@ const transporter = require('../config/emailConfig');
 
 const pool = new Pool(require('../config/db'));
 
-//Y
+//Ydsdsdsd
 exports.register = async (req, res) => {
   const { username, password, email} = req.body;
 
