@@ -7,7 +7,7 @@ const pool = new Pool(require('../config/db'));
 
 // Registro de usuarios
 exports.register = async (req, res) => {
-  const { username, password, email, acceptTerms } = req.body;
+  const { username, password, email, acceptTerms} = req.body;
 
   try {
     // Verificar si el usuario ya existe
@@ -19,24 +19,11 @@ exports.register = async (req, res) => {
     // Hashear la contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Insertar el usuario en la base de datos
-    const userResult = await pool.query(
-      'INSERT INTO users (username, password, email) VALUES ($1, $2, $3) RETURNING id',
-      [username, hashedPassword, email]
-    );
-
-    const userId = userResult.rows[0].id;
-
-    // Registrar la aceptación de términos y condiciones
-    await pool.query(
-      'INSERT INTO user_terms_conditions (user_id, accepted) VALUES ($1, $2)',
-      [userId, acceptTerms]
-    );
-
-    res.status(200).json({ message: 'Usuario registrado y términos aceptados' });
-  } catch (err) {
-    console.error('Error al registrar el usuario:', err);
-    res.status(500).json({ error: 'Error en el servidor' });
+    await pool.query('INSERT INTO users (username, password, email, acceptTerms) VALUES ($1, $2, $3, $4)', [username, hashedPassword, email, acceptTerms]);
+    res.status(201).json({ message: 'Usuario registrado exitosamente' });
+  } catch (error) {
+    console.error('Error al registrar el usuario:', error);
+    res.status(500).json({ message: 'Error en el registro: ' + error.message });
   }
 };
 
