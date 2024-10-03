@@ -8,7 +8,7 @@ const pool = new Pool(require('../config/db'));
 
 
 exports.register = async (req, res) => {
-  const { username, password, email, acceptTerms} = req.body;
+  const { username, password, email} = req.body;
 
   try {
     const userExists = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
@@ -18,7 +18,7 @@ exports.register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await pool.query('INSERT INTO users (username, password, email, acceptTerms) VALUES ($1, $2, $3, $4)', [username, hashedPassword, email, acceptTerms]);
+    await pool.query('INSERT INTO users (username, password, email) VALUES ($1, $2, $3)', [username, hashedPassword, email]);
     res.status(201).json({ message: 'Usuario registrado exitosamente' });
   } catch (error) {
     console.error('Error al registrar el usuario:', error);
