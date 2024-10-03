@@ -1,50 +1,14 @@
-const express = require('express');
-const cors = require('cors');
-const routes = require('./routes/authRoutes'); 
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-
-app.use('/', routes);
-
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor escuchando en http://localhost:${PORT}`);
-});
-
-
-/**const express = require('express');
-const cors = require('cors');
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const nodemailer = require('nodemailer');
+const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-const pool = new Pool({
-  user: 'postgres',     
-  host: 'localhost',
-  database: 'GstWeb',   
-  password: 'postgres',  
-  port: 5432,
-});
+const transporter = require('../config/emailConfig');
 
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'moisesbuitrago201@gmail.com', 
-    pass: 'vhuj ndov yuds pqrq' 
-  }
-});
+const pool = new Pool(require('../config/db'));
 
-app.post('/register', async (req, res) => {
-  const { username, password, email } = req.body;
+
+exports.register = async (req, res) => {
+  const { username, password, email, acceptTerms} = req.body;
 
   try {
     const userExists = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
@@ -54,16 +18,16 @@ app.post('/register', async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await pool.query('INSERT INTO users (username, password, email) VALUES ($1, $2, $3)', [username, hashedPassword, email]);
+    await pool.query('INSERT INTO users (username, password, email, acceptTerms) VALUES ($1, $2, $3, $4)', [username, hashedPassword, email, acceptTerms]);
     res.status(201).json({ message: 'Usuario registrado exitosamente' });
   } catch (error) {
     console.error('Error al registrar el usuario:', error);
     res.status(500).json({ message: 'Error en el registro: ' + error.message });
   }
-});
+};
 
 
-app.post('/login', async (req, res) => {
+exports.login = async (req, res) => {
   const { username, password } = req.body;
 
   try {
@@ -77,9 +41,7 @@ app.post('/login', async (req, res) => {
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (passwordMatch) {
-
       const token = jwt.sign({ username: user.username }, 'secretkey', { expiresIn: '10m' });
-
 
       const mailOptions = {
         from: 'tuemail@gmail.com',
@@ -95,7 +57,6 @@ app.post('/login', async (req, res) => {
           res.json({ message: 'Correo con token enviado exitosamente' });
         }
         console.log('Correo enviado: ' + info.response);
-        console.log(info.accepted);
       });
 
     } else {
@@ -105,8 +66,10 @@ app.post('/login', async (req, res) => {
     console.error('Error al hacer login:', error);
     res.status(500).json({ message: 'Error al hacer login' });
   }
-});
-app.post('/verify-token', (req, res) => {
+};
+
+
+exports.verifyToken = (req, res) => {
   const { token } = req.body;
 
   jwt.verify(token, 'secretkey', (err, decoded) => {
@@ -116,18 +79,4 @@ app.post('/verify-token', (req, res) => {
       res.json({ message: 'Token verificado correctamente', user: decoded.username });
     }
   });
-});
-
-transporter.verify(function (error, success) {
-  if (error) {
-    console.log(error);
-  } else {
-    console.log("El servidor esta listo y cargado!");
-  }
-});
-
-
-// Iniciar el servidor
-app.listen(3000, () => {
-  console.log('Backend escuchando en http://localhost:3000');
-}); **/
+};
