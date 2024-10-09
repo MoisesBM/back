@@ -15,7 +15,7 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: 'El usuario ya existe' });
     }
 
-    //Se implemento la validacion de correos electronicos existentes. - MOISESBM
+    //Se implemento la validacion de correos electronicos existentes. - MOISESBMM
     const emailExists = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
     if (emailExists.rows.length > 0) {
       return res.status(400).json({message: 'El correo ya está registrado' });
