@@ -12,7 +12,7 @@ transporter.verify(function (error, success) {
   if (error) {
     console.log(error);
   } else {
-    console.log("El servidor de correo está listo y funcionando!");
+    console.log("El servidor de correo está listo y funcionando!d");
   }
 
 });
