@@ -54,7 +54,9 @@ exports.login = async (req, res) => {
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (passwordMatch) {
-      const token = jwt.sign({ username: user.username }, 'secretkey', { expiresIn: '10m' });
+
+
+      const token = jwt.sign({id: user.id, username: user.username }, 'secretkey', { expiresIn: '10m' });
 
       const mailOptions = {
         from: 'tuemail@gmail.com',
