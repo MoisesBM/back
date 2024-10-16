@@ -29,10 +29,8 @@ exports.register = async (req, res) => {
     res.status(201).json({ message: 'Usuario registrado exitosamente' });
 
     const userId = userResult.rows[0].id; 
-    if (response.data.userId) {
-      localStorage.setItem('id', response.data.userId);
-    }
     
+    //Validacion de aceptacion de terminos y condiciones
      const accepted = acceptTerms === true || acceptTerms === 'true' ? 0 : 1;
      await pool.query('INSERT INTO user_terms_conditions (user_id, accepted, accepted_at) VALUES ($1, $2, NOW())', [userId, accepted]);
     
@@ -52,15 +50,8 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Credenciales incorrectas' });
     }
 
-    //Almacenamiento de username en localstorage
-    //datastorage = localStorage.setItem("username", userResult.rows[0].username);
-    //console.log("Almacenamiento de username en localstorage", datastorage);
-
-    //mostrar el username y password
-
     const user = result.rows[0];
     const passwordMatch = await bcrypt.compare(password, user.password);
-    //localStorage.setItem('id', userResult.rows[0].id); 
 
     if (passwordMatch) {
       const token = jwt.sign({ username: user.username }, 'secretkey', { expiresIn: '10m' });
@@ -68,7 +59,7 @@ exports.login = async (req, res) => {
       const mailOptions = {
         from: 'tuemail@gmail.com',
         to: user.email,
-        subject: 'sToken de acceso',
+        subject: 'Token de acceso',
         text: `Tu token de acceso es: ${token}`
       };
 
@@ -76,14 +67,9 @@ exports.login = async (req, res) => {
         if (error) {
           return res.status(500).json({ message: 'Error al enviar correo: ' + error.message });
         } else {
-          res.json({ message: 'Correo con token enviado exitosamente', userId: user.id });
-          
+          res.json({ message: 'Correo con token enviado exitosamente' });
         }
-
-        //pruebas de datos - MOISESBM
-       // console.error(response.userId);
-        //console.log(response.userId);
-        //console.log(response.localStorage);
+        console.log('Correo enviado: ' + info.response);
       });
 
     } else {
