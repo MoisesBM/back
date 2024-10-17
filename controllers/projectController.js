@@ -20,3 +20,16 @@ exports.createProject = async (req, res) => {
     res.status(500).json({ message: 'Error al crear el proyecto' });
   }
 };
+
+exports.getProjects = async (req, res) => {
+    try {
+      const userId = req.user.id; // Asegúrate de que el ID del usuario esté disponible desde el token
+      const result = await pool.query(
+        'SELECT * FROM projects WHERE user_id = $1',
+        [userId]
+      );
+      res.status(200).json(result.rows);
+    } catch (error) {
+      res.status(500).json({ message: 'Error al obtener proyectos' });
+    }
+  };
