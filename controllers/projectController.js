@@ -47,7 +47,7 @@ exports.getProjects = async (req, res) => {
 
 exports.deleteProject = async (req, res) => {
   const projectId = req.params.id;
-  const username = req.query.username; // Obtener el username de los parámetros de consulta
+  const username = req.query.username; 
 
   try {
     const result = await pool.query(
