@@ -22,4 +22,9 @@ router.post('/projects/:id/users', projectController.assignUserToProject)
 // Ruta para eliminar un usuario de un proyecto
 router.delete('/projects/:id/users/:userId', projectController.removeUserFromProject);
 
+router.get('/assigned-projects', projectController.getAssignedProjects);
+router.post('/tasks/assign', projectController.assignTaskToUser);
+
+
+
 module.exports = router;

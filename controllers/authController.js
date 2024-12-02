@@ -1,6 +1,5 @@
 const bcrypt = require('bcrypt');
 const { Pool } = require('pg');
-const transporter = require('../config/emailConfig');
 const pool = new Pool(require('../config/db'));
 
 const handleDatabaseError = (res, error) => {

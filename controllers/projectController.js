@@ -2,11 +2,12 @@ const { Pool } = require('pg');
 const pool = new Pool(require('../config/db'));
 
 exports.createProject = async (req, res) => {
-  const { name, description, date } = req.body;
+  const { name, description, date, newdate} = req.body;
   const username = req.body.username;
 
   try {
     console.log("Creando proyecto para el usuario:", username);
+    console.log("Nuevo campo:", newdate);
 
     const result = await pool.query(
       'INSERT INTO projects (name, description, date, username) VALUES ($1, $2, $3, $4) RETURNING *',
@@ -227,4 +228,58 @@ exports.removeUserFromProject = async (req, res) => {
     console.error('Error al eliminar el usuario del proyecto:', error);
     res.status(500).json({ message: 'Error al eliminar el usuario del proyecto' });
   }
+};
+
+exports.getAssignedProjects = async (req, res) => {
+  const username = req.query.username;
+
+  if (!username) {
+    return res.status(400).json({ message: 'El nombre de usuario es requerido' });
+  }
+
+  try {
+    // Obtener el ID del usuario a partir del nombre de usuario
+    const userResult = await pool.query('SELECT id FROM users WHERE username = $1', [username]);
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+    const userId = userResult.rows[0].id;
+
+    // Obtener los proyectos asignados al usuario junto con el nombre del creador
+    const assignedProjectsResult = await pool.query(
+      `SELECT p.id, p.name, p.description, p.date, p.username AS creator
+       FROM projects p
+       JOIN project_users pu ON p.id = pu.project_id
+       WHERE pu.user_id = $1`,
+      [userId]
+    );
+
+    res.status(200).json(assignedProjectsResult.rows);
+  } catch (error) {
+    console.error('Error al obtener los proyectos asignados:', error);
+    res.status(500).json({ message: 'Error al obtener los proyectos asignados' });
+  }
+};
+exports.assignTaskToUser = async (req, res) => {
+  const { taskId, userId } = req.body; 
+
+  if (!taskId || !userId) {
+    return res.status(400).json({ message: 'El taskId y el userId son obligatorios' });
+  }
+
+  try {
+    const result = await pool.query(
+      'UPDATE tasks SET assigned_user_id = $1 WHERE id = $2 RETURNING *',
+      [userId, taskId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Tarea no encontrada' });
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error al asignar la tarea al usuario (BACKEND):', error);
+    res.status(500).json({ message: 'Error al asignar la tarea al usuario' });
+  }
 };
